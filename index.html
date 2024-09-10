@@ -99,8 +99,28 @@
     </div>
 
     <script>
+        // 日付と時刻の表示を更新する関数
+        function updateDateTime() {
+            const now = new Date();
+            const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+            const dayOfWeek = weekdays[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const period = (hours >= 5 && hours < 12) ? '朝' :
+                           (hours >= 12 && hours < 18) ? '昼' : '夜';
+
+            document.querySelector('.header').textContent = `${month} ${day}日 ${dayOfWeek}`;
+            document.querySelector('.time').textContent = `${period}：${hours}:${minutes} の服薬`;
+        }
+
+        // カメラを起動して映像を取得する関数
         async function startFaceDetection() {
-            await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+            await faceapi.nets.tinyFaceDetector.loadFromUri('/models'); // Face API.js モデルのロード
             const video = document.getElementById('cameraStream');
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -108,7 +128,7 @@
                     .then(function(stream) {
                         video.srcObject = stream;
                         video.play();
-                        detectFace();
+                        detectFace(); // 顔検出を開始
                     })
                     .catch(function(error) {
                         console.error("カメラのアクセスに失敗しました: ", error);
@@ -118,6 +138,7 @@
             }
         }
 
+        // 顔検出とエフェクト処理を行う関数
         async function detectFace() {
             const video = document.getElementById('cameraStream');
             const message = document.querySelector('.message');
@@ -140,24 +161,7 @@
             }, 1000);  // 1秒ごとに顔検出を更新
         }
 
-        function updateDateTime() {
-            const now = new Date();
-            const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-
-            const dayOfWeek = weekdays[now.getDay()];
-            const day = now.getDate();
-            const month = months[now.getMonth()];
-
-            let hours = now.getHours();
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const period = (hours >= 5 && hours < 12) ? '朝' :
-                           (hours >= 12 && hours < 18) ? '昼' : '夜';
-
-            document.querySelector('.header').textContent = `${month} ${day}日 ${dayOfWeek}`;
-            document.querySelector('.time').textContent = `${period}：${hours}:${minutes} の服薬`;
-        }
-
+        // ページ読み込み時に日付・時刻を表示し、カメラを起動
         window.onload = () => {
             updateDateTime();
             startFaceDetection();
