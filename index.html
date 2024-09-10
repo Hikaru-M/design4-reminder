@@ -79,7 +79,9 @@
             color: red;
         }
     </style>
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <!-- TensorFlow.jsと顔検出モデルのライブラリ -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
 </head>
 <body>
     <div class="container">
@@ -103,7 +105,7 @@
         function updateDateTime() {
             const now = new Date();
             const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月'];
 
             const dayOfWeek = weekdays[now.getDay()];
             const day = now.getDate();
@@ -118,47 +120,40 @@
             document.querySelector('.time').textContent = `${period}：${hours}:${minutes} の服薬`;
         }
 
-        // カメラを起動して映像を取得する関数
+        // TensorFlow.jsを使用して顔検出を開始
         async function startFaceDetection() {
-            await faceapi.nets.tinyFaceDetector.loadFromUri('/models'); // Face API.js モデルのロード
-            const video = document.getElementById('cameraStream');
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        video.srcObject = stream;
-                        video.play();
-                        detectFace(); // 顔検出を開始
-                    })
-                    .catch(function(error) {
-                        console.error("カメラのアクセスに失敗しました: ", error);
-                    });
-            } else {
-                console.error("このブラウザはカメラをサポートしていません。");
-            }
-        }
-
-        // 顔検出とエフェクト処理を行う関数
-        async function detectFace() {
             const video = document.getElementById('cameraStream');
             const message = document.querySelector('.message');
             const buttons = document.querySelector('.buttons');
 
-            setInterval(async () => {
-                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                
-                if (detections.length > 0) {
-                    video.style.border = '5px solid green';  // 顔が検出されたら枠を緑に変更
-                    message.textContent = 'OK';
-                    message.style.color = 'green';
-                    buttons.style.display = 'flex';  // 服薬確認ボタンを表示
-                } else {
-                    video.style.border = '5px solid red';  // 顔が検出されない場合は赤い枠
-                    message.textContent = '顔を映してください';
-                    message.style.color = 'red';
-                    buttons.style.display = 'none';  // ボタンを非表示
-                }
-            }, 1000);  // 1秒ごとに顔検出を更新
+            // カメラのストリームを取得
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.play();
+
+                // 顔検出モデルをロード
+                const model = await faceLandmarksDetection.load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
+
+                // 顔検出ループ
+                setInterval(async () => {
+                    const predictions = await model.estimateFaces({ input: video });
+
+                    if (predictions.length > 0) {
+                        video.style.border = '5px solid green';  // 顔が検出されたら枠を緑に変更
+                        message.textContent = 'OK';
+                        message.style.color = 'green';
+                        buttons.style.display = 'flex';  // 服薬確認ボタンを表示
+                    } else {
+                        video.style.border = '5px solid red';  // 顔が検出されない場合は赤い枠
+                        message.textContent = '顔を映してください';
+                        message.style.color = 'red';
+                        buttons.style.display = 'none';  // ボタンを非表示
+                    }
+                }, 1000);  // 1秒ごとに顔検出を更新
+            } else {
+                console.error("このブラウザはカメラをサポートしていません。");
+            }
         }
 
         // ページ読み込み時に日付・時刻を表示し、カメラを起動
