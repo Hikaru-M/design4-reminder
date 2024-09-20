@@ -160,9 +160,9 @@
             // BlazeFaceモデルをロード
             const model = await blazeface.load();
 
-            // 顔検出をループで実行
+            // 顔検出をループで実行（500msごとに実行）
             setInterval(async () => {
-                const predictions = await model.estimateFaces(video, false);
+                const predictions = await model.estimateFaces(video, { maxFaces: 1 }); // 1つの顔だけを検出
 
                 if (predictions.length > 0) {
                     // 顔が検出された場合の処理
@@ -177,7 +177,7 @@
                     message.style.color = 'red';
                     buttons.style.display = 'none';  // ボタンを非表示
                 }
-            }, 1000);  // 1秒ごとに顔検出を実行
+            }, 500);  // 500msごとに顔検出を実行
         }
 
         // ページが読み込まれたときに日時を更新し、顔検出を開始
