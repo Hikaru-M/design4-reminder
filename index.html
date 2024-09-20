@@ -117,6 +117,8 @@
     </div>
 
     <script>
+        let model; // モデルをグローバルに保持
+
         // 現在の日付と時刻を表示する関数
         function updateDateTime() {
             const now = new Date();
@@ -139,26 +141,32 @@
         // カメラを起動して映像を取得
         const video = document.getElementById('cameraStream');
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
+        async function initializeCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                     video.srcObject = stream;
                     video.play();
-                })
-                .catch(function(error) {
+                } catch (error) {
                     console.error("カメラのアクセスに失敗しました: ", error);
-                });
-        } else {
-            console.error("このブラウザはカメラをサポートしていません。");
+                }
+            } else {
+                console.error("このブラウザはカメラをサポートしていません。");
+            }
         }
 
-        // TensorFlow.jsを使用して顔検出を実装
+        // モデルとカメラを事前に初期化
+        window.onload = async () => {
+            updateDateTime();
+            model = await blazeface.load();  // モデルをロード
+            initializeCamera();  // カメラを初期化
+            startFaceDetection();  // 顔検出開始
+        };
+
+        // 顔検出を実行
         async function startFaceDetection() {
             const message = document.querySelector('.message');
             const buttons = document.querySelector('.buttons');
-            
-            // BlazeFaceモデルをロード
-            const model = await blazeface.load();
 
             // 顔検出をループで実行（500msごとに実行）
             setInterval(async () => {
@@ -179,12 +187,6 @@
                 }
             }, 500);  // 500msごとに顔検出を実行
         }
-
-        // ページが読み込まれたときに日時を更新し、顔検出を開始
-        window.onload = () => {
-            updateDateTime();
-            startFaceDetection();
-        };
     </script>
 </body>
 </html>
