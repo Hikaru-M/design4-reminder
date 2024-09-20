@@ -155,13 +155,17 @@
             }
         }
 
-        // モデルとカメラを事前に初期化
-        window.onload = async () => {
+        // モデルとカメラを独立して初期化
+        window.onload = () => {
             updateDateTime();
-            model = await blazeface.load();  // モデルをロード
-            initializeCamera();  // カメラを初期化
-            startFaceDetection();  // 顔検出開始
+            initializeCamera();  // カメラを即座に初期化
+            loadModelAndStartDetection();  // モデルをロードして顔検出を開始
         };
+
+        async function loadModelAndStartDetection() {
+            model = await blazeface.load();  // モデルをロード
+            startFaceDetection();  // 顔検出開始
+        }
 
         // 顔検出を実行
         async function startFaceDetection() {
@@ -170,20 +174,22 @@
 
             // 顔検出をループで実行（500msごとに実行）
             setInterval(async () => {
-                const predictions = await model.estimateFaces(video, { maxFaces: 1 }); // 1つの顔だけを検出
+                if (model) {
+                    const predictions = await model.estimateFaces(video, { maxFaces: 1 }); // 1つの顔だけを検出
 
-                if (predictions.length > 0) {
-                    // 顔が検出された場合の処理
-                    video.style.border = '5px solid green';  // 緑の枠に変更
-                    message.textContent = '顔が認識されました';
-                    message.style.color = 'green';
-                    buttons.style.display = 'flex';  // ボタンを表示
-                } else {
-                    // 顔が検出されなかった場合の処理
-                    video.style.border = '5px solid red';  // 赤い枠のまま
-                    message.textContent = '顔を映してください';
-                    message.style.color = 'red';
-                    buttons.style.display = 'none';  // ボタンを非表示
+                    if (predictions.length > 0) {
+                        // 顔が検出された場合の処理
+                        video.style.border = '5px solid green';  // 緑の枠に変更
+                        message.textContent = '顔が認識されました';
+                        message.style.color = 'green';
+                        buttons.style.display = 'flex';  // ボタンを表示
+                    } else {
+                        // 顔が検出されなかった場合の処理
+                        video.style.border = '5px solid red';  // 赤い枠のまま
+                        message.textContent = '顔を映してください';
+                        message.style.color = 'red';
+                        buttons.style.display = 'none';  // ボタンを非表示
+                    }
                 }
             }, 500);  // 500msごとに顔検出を実行
         }
