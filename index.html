@@ -48,7 +48,7 @@
             font-size: 1.2em;
         }
         .buttons {
-            display: none;
+            display: none; /* 初期は非表示 */
             justify-content: space-between;
             gap: 6px;
             margin-top: 8px;
@@ -72,14 +72,13 @@
             object-fit: cover;
             object-position: center;
             margin-bottom: 8px;
-            border: 5px solid red; /* 初期状態で赤い枠 */
+            border: 5px solid red; /* 初期状態は赤い枠 */
         }
         .message {
             font-size: 1.2em;
             color: red;
         }
     </style>
-    <!-- TensorFlow.jsとBlazeFaceモデルのライブラリ -->
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
 </head>
@@ -95,17 +94,18 @@
             <div class="medication-dosage">処方薬 1錠</div>
         </div>
         <div class="buttons">
+            <!-- ボタンが表示されたときにクリック可能 -->
             <button onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSeslJsMnOr8zd2wikJRDOV9iaKjjVQyCffybaV44YNXuWJ9iw/viewform?usp=pp_url&entry.366340186=%E3%82%B9%E3%82%AD%E3%83%83%E3%83%97'">スキップ</button>
             <button onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSeslJsMnOr8zd2wikJRDOV9iaKjjVQyCffybaV44YNXuWJ9iw/viewform?usp=pp_url&entry.366340186=%E6%9C%8D%E8%96%AC'">服薬</button>
         </div>
     </div>
 
     <script>
-        // 日付と時刻の表示を更新する関数
+        // 現在の日付と時刻を表示する関数
         function updateDateTime() {
             const now = new Date();
             const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月'];
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
             const dayOfWeek = weekdays[now.getDay()];
             const day = now.getDate();
@@ -120,43 +120,51 @@
             document.querySelector('.time').textContent = `${period}：${hours}:${minutes} の服薬`;
         }
 
-        // TensorFlow.jsを使用して顔検出を開始
-        async function startFaceDetection() {
-            const video = document.getElementById('cameraStream');
-            const message = document.querySelector('.message');
-            const buttons = document.querySelector('.buttons');
+        // カメラを起動して映像を取得
+        const video = document.getElementById('cameraStream');
 
-            // カメラのストリームを取得
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                video.play();
-
-                // BlazeFaceモデルをロード
-                const model = await blazeface.load();
-
-                // 顔検出ループ
-                setInterval(async () => {
-                    const predictions = await model.estimateFaces(video, false);
-
-                    if (predictions.length > 0) {
-                        video.style.border = '5px solid green';  // 顔が検出されたら枠を緑に変更
-                        message.textContent = 'OK';
-                        message.style.color = 'green';
-                        buttons.style.display = 'flex';  // 服薬確認ボタンを表示
-                    } else {
-                        video.style.border = '5px solid red';  // 顔が検出されない場合は赤い枠
-                        message.textContent = '顔を映してください';
-                        message.style.color = 'red';
-                        buttons.style.display = 'none';  // ボタンを非表示
-                    }
-                }, 1000);  // 1秒ごとに顔検出を更新
-            } else {
-                console.error("このブラウザはカメラをサポートしていません。");
-            }
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(error) {
+                    console.error("カメラのアクセスに失敗しました: ", error);
+                });
+        } else {
+            console.error("このブラウザはカメラをサポートしていません。");
         }
 
-        // ページ読み込み時に日付・時刻を表示し、カメラを起動
+        // TensorFlow.jsを使用して顔検出を実装
+        async function startFaceDetection() {
+            const message = document.querySelector('.message');
+            const buttons = document.querySelector('.buttons');
+            
+            // BlazeFaceモデルをロード
+            const model = await blazeface.load();
+
+            // 顔検出をループで実行
+            setInterval(async () => {
+                const predictions = await model.estimateFaces(video, false);
+
+                if (predictions.length > 0) {
+                    // 顔が検出された場合の処理
+                    video.style.border = '5px solid green';  // 緑の枠に変更
+                    message.textContent = 'OK';
+                    message.style.color = 'green';
+                    buttons.style.display = 'flex';  // ボタンを表示
+                } else {
+                    // 顔が検出されなかった場合の処理
+                    video.style.border = '5px solid red';  // 赤い枠のまま
+                    message.textContent = '顔を映してください';
+                    message.style.color = 'red';
+                    buttons.style.display = 'none';  // ボタンを非表示
+                }
+            }, 1000);  // 1秒ごとに顔検出を実行
+        }
+
+        // ページが読み込まれたときに日時を更新し、顔検出を開始
         window.onload = () => {
             updateDateTime();
             startFaceDetection();
