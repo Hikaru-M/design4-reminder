@@ -77,6 +77,7 @@
         .message {
             font-size: 1.2em;
             color: red;
+            margin-bottom: 10px;
         }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
@@ -88,7 +89,7 @@
         <div class="time"></div>
         <!-- 自己鏡映像 -->
         <video id="cameraStream" autoplay playsinline></video>
-        <div class="message">顔を映してください</div>
+        <div class="message">顔を映してください</div> <!-- ここにメッセージが表示される -->
         <div class="medication-info">
             <img src="https://github.com/Hikaru-M/medication-reminder/blob/main/capsule-1.jpg?raw=true" alt="薬の画像">
             <div class="medication-dosage">処方薬 1錠</div>
@@ -137,38 +138,4 @@
         }
 
         // TensorFlow.jsを使用して顔検出を実装
-        async function startFaceDetection() {
-            const message = document.querySelector('.message');
-            const buttons = document.querySelector('.buttons');
-            
-            // BlazeFaceモデルをロード
-            const model = await blazeface.load();
-
-            // 顔検出をループで実行
-            setInterval(async () => {
-                const predictions = await model.estimateFaces(video, false);
-
-                if (predictions.length > 0) {
-                    // 顔が検出された場合の処理
-                    video.style.border = '5px solid green';  // 緑の枠に変更
-                    message.textContent = 'OK';
-                    message.style.color = 'green';
-                    buttons.style.display = 'flex';  // ボタンを表示
-                } else {
-                    // 顔が検出されなかった場合の処理
-                    video.style.border = '5px solid red';  // 赤い枠のまま
-                    message.textContent = '顔を映してください';
-                    message.style.color = 'red';
-                    buttons.style.display = 'none';  // ボタンを非表示
-                }
-            }, 1000);  // 1秒ごとに顔検出を実行
-        }
-
-        // ページが読み込まれたときに日時を更新し、顔検出を開始
-        window.onload = () => {
-            updateDateTime();
-            startFaceDetection();
-        };
-    </script>
-</body>
-</html>
+        async
