@@ -21,7 +21,7 @@
             margin: 0 auto;
             text-align: center;
             box-sizing: border-box;
-            position: relative;
+            position: relative; /* 相対位置 */
         }
         .header {
             font-size: 1.2em;
@@ -83,9 +83,9 @@
         }
         .face-frame {
             position: absolute;
-            top: 50%; /* 中央に位置 */
+            top: 110px; /* 顔枠を中央付近に表示 */
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             width: 180px;
             height: 240px; /* 楕円形 */
             border: 3px solid white; /* 白色の細い枠 */
@@ -123,7 +123,7 @@
         function updateDateTime() {
             const now = new Date();
             const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月'];
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
             const dayOfWeek = weekdays[now.getDay()];
             const day = now.getDate();
@@ -179,7 +179,7 @@
 
                     if (predictions.length > 0) {
                         // 顔が検出された場合の処理
-                        video.style.border = '5px solid lime';  // 薄い緑色の枠に変更
+                        video.style.border = '5px solid lime';  // 緑の枠に変更
                         message.textContent = '顔が認識されました';
                         message.style.color = 'green';
                         buttons.style.display = 'flex';  // ボタンを表示
