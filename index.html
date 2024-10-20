@@ -180,13 +180,13 @@
                     if (predictions.length > 0) {
                         // 顔が検出された場合の処理
                         video.style.border = '5px solid green';  // 緑の枠に変更
-                        message.textContent = '顔が認識されました';
-                        message.style.color = 'green';
+                        message.textContent = '服薬するかどうか決めてください';
+                        message.style.color = 'lime';
                         buttons.style.display = 'flex';  // ボタンを表示
                     } else {
                         // 顔が検出されなかった場合の処理
                         video.style.border = '5px solid red';  // 赤い枠のまま
-                        message.textContent = '顔を映してください';
+                        message.textContent = '顔を見てください';
                         message.style.color = 'red';
                         buttons.style.display = 'none';  // ボタンを非表示
                     }
