@@ -83,7 +83,7 @@
         }
         .face-frame {
             position: absolute;
-            top: 110px; /* 顔枠を中央付近に表示 */
+            top: 120px; /* 顔枠をより中央に配置 */
             left: 50%;
             transform: translateX(-50%);
             width: 180px;
@@ -123,7 +123,7 @@
         function updateDateTime() {
             const now = new Date();
             const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月'];
 
             const dayOfWeek = weekdays[now.getDay()];
             const day = now.getDate();
@@ -179,14 +179,14 @@
 
                     if (predictions.length > 0) {
                         // 顔が検出された場合の処理
-                        video.style.border = '5px solid green';  // 緑の枠に変更
-                        message.textContent = '服薬するかどうか決めてください';
-                        message.style.color = 'lime';
+                        video.style.border = '5px solid lime';  // 薄い緑色の枠に変更
+                        message.textContent = '顔が認識されました';
+                        message.style.color = 'green';
                         buttons.style.display = 'flex';  // ボタンを表示
                     } else {
                         // 顔が検出されなかった場合の処理
                         video.style.border = '5px solid red';  // 赤い枠のまま
-                        message.textContent = '顔を見てください';
+                        message.textContent = '顔を映してください';
                         message.style.color = 'red';
                         buttons.style.display = 'none';  // ボタンを非表示
                     }
