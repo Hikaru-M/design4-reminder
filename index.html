@@ -81,18 +81,7 @@
             color: red;
             margin-bottom: 10px;
         }
-        .face-frame {
-            position: absolute;
-            top: 110px; /* 顔枠を中央付近に表示 */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            height: 240px; /* 楕円形 */
-            border: 3px solid white; /* 白色の細い枠 */
-            border-radius: 50%; /* 楕円形にする */
-            pointer-events: none; /* 枠が操作を妨げない */
-            z-index: 2; /* ビデオの上に表示 */
-        }
+        
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
@@ -104,7 +93,7 @@
         <!-- 自己鏡映像 -->
         <video id="cameraStream" autoplay playsinline></video>
         <div class="face-frame"></div> <!-- 顔を当てはめる楕円形の枠 -->
-        <div class="message">顔を映してください</div>
+        <div class="message">顔を見てください</div>
         <div class="medication-info">
             <img src="https://github.com/Hikaru-M/medication-reminder/blob/main/capsule-1.jpg?raw=true" alt="薬の画像">
             <div class="medication-dosage">処方薬 1錠</div>
@@ -180,7 +169,7 @@
                     if (predictions.length > 0) {
                         // 顔が検出された場合の処理
                         video.style.border = '5px solid lime';  // 緑の枠に変更
-                        message.textContent = '服薬するかどうか決めてください';
+                        message.textContent = '服薬するか決めてください';
                         message.style.color = 'green';
                         buttons.style.display = 'flex';  // ボタンを表示
                     } else {
