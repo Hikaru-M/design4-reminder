@@ -81,7 +81,18 @@
             color: red;
             margin-bottom: 10px;
         }
-        
+        .face-frame {
+            position: absolute;
+            top: 110px; /* 顔枠を中央付近に表示 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 240px; /* 楕円形 */
+            border: 3px solid white; /* 白色の細い枠 */
+            border-radius: 50%; /* 楕円形にする */
+            pointer-events: none; /* 枠が操作を妨げない */
+            z-index: 2; /* ビデオの上に表示 */
+        }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
